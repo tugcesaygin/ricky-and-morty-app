@@ -1,20 +1,43 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import useGetEpisodes from './src/hooks/useGetEpisodes';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+import Tabs from './src/navigation/Tabs';
+import useGetCharacters from './src/hooks/useGetCharacters';
+
+const App = () => {
+  const { episodes, loading: episodesLoading, error: episodesError } = useGetEpisodes();
+  const { characters, loading: charactersLoading, error: charactersError } = useGetCharacters();
+
+  const Tab = createBottomTabNavigator();
+
+  if (episodesLoading || charactersLoading) { 
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size={'large'} color={'#FEA1A1'} />
+      </View>
+    );
+  }
+
+  if (episodes) {
+    return (
+      <NavigationContainer>
+        <Tabs episodes={episodes} characters={characters} /> 
+        <StatusBar style="auto" />
+      </NavigationContainer>
+    );
+  }
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
   },
 });
+
+export default App;
